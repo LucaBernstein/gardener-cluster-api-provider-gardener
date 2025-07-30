@@ -24,9 +24,46 @@ Specifically, CAPGa implements the Cluster API’s provider interfaces to manage
 
 ![Image showing the interaction of CAPI and Gardener through CAPGa](./static/capi-interaction-gardener-capga.svg)
 
+### What is the difference between Gardener API and Cluster API?
+
+Gardener and Cluster API both aim to automate Kubernetes cluster management, but they approach the problem from opposite directions and with different user audiences in mind.
+
+#### Gardener API: Platform-first and top-down
+
+Gardener is a top-down architected platform, designed to deliver homogeneous Kubernetes clusters across clouds as a Service. It was built with application or service teams in mind who require consistent, production-ready Kubernetes clusters without managing internal details.
+- A single manifest defines an entire cluster (`Shoot`) with platform-chosen defaults.
+- Users benefit from a user experience layer, sensible defaults, and well-integrated extensions (e.g. DNS, worker pools, cloud-specific settings).
+- Cluster lifecycle is abstracted away: versioning, networking, and OS images are handled centrally.
+- Clusters can be managed for multiple cloud providers simultaneously.
+
+#### Cluster API: Infrastructure-centric and bottom-up
+
+Cluster API (CAPI), on the other hand, is a bottom-up framework for building cluster management solutions. It’s aimed at infrastructure teams who need fine-grained control over every component of a Kubernetes cluster and know how to assemble them.
+- A cluster is defined via multiple resource manifests (Cluster, MachineDeployment, KubeadmConfig, etc.).
+- Each resource is reconciled by dedicated controllers.
+- There’s no opinionated user interface. Users must understand the internals of Kubernetes cluster bootstrapping.
+- Powerful for building your own platform, but requires substantial operational ownership.
+
+You can think of Gardener as a second evolutionary stage of Cluster API: more opinionated, more integrated, and focused on platform-level concerns.
+
+### When to use which?
+
+|                      | Cluster API                          | Gardener API                               |
+|----------------------|--------------------------------------|--------------------------------------------|
+| Target audience      | Infrastructure / platform engineers  | Application / service teams                |
+| Interface style      | Multiple manifests, component-driven | One manifest, opinionated, platform-driven |
+| Ownership            | End user manages infrastructure      | Platform team manages infrastructure       |
+| Multi-cloud support  | Configure it yourself                | Built-in                                   |
+| Lifecycle automation | Assemble from primitives             | Out-of-the-box automation                  |
+
 ### Why did we build CAPGa?
 
 Gardener provides a powerful way to manage Kubernetes clusters at scale across many infrastructures. At the same time, Cluster API has become a widely adopted standard for cluster management. CAPGa aims to bridge these two projects, giving users a way to manage Gardener clusters with Cluster API-compatible controllers and tools.
+
+This unlocks several new use cases:
+- Users familiar with CAPI tooling can now manage Gardener-based clusters.
+- Integrators can plug Gardener into existing Cluster API-based workflows.
+- Platforms can gradually move towards a unified control plane managed by Gardener, while still using familiar CAPI resources.
 
 ### Key Features
 
